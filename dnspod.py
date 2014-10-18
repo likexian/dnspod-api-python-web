@@ -11,9 +11,20 @@
 ##
 
 
+import ssl
 import json
 import requests
 from flask import session
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
+
+
+class MyAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(num_pools=connections,
+                                       maxsize=maxsize,
+                                       block=block,
+                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 
 class utils:
@@ -97,8 +108,10 @@ class dnspod(object):
 
     def post_data(self, api, data, cookies):
         try:
+            request = requests.Session()
+            request.mount('https://', MyAdapter())
             headers = {'User-Agent': 'DNSPod API Flask Web Client/1.0.0 (i@likexian.com)'}
-            response = requests.post(api, data=data, headers=headers, cookies=cookies, timeout=30)
+            response = request.post(api, data=data, headers=headers, cookies=cookies, timeout=30)
             results = json.loads(response.text)
         except:
             raise DNSPodException('danger', u'内部错误：调用失败', '')
