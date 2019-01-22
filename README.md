@@ -1,9 +1,5 @@
 # DNSPod API Flask Web 示例
 
-## 与我联系
-- [李院长](http://github.com/likexian)
-- [http://www.likexian.com/](http://www.likexian.com/)
-
 ## 功能说明
 用Python实现了一个 DNSPod API 的 Web 示例，已完成对域名和记录的基本操作，可直接使用。
 
@@ -34,9 +30,14 @@
 然后在浏览器中打开 http://127.0.0.1:5000/ 即可查看示例。
 
 ## DEMO
-请打开 demo 目录查看相关截图。
+请打开 [demo](demo) 目录查看相关截图。
 
 ## LICENSE
-Copyright 2011-2014, Kexian Li
+
+Copyright 2011-2019, Li Kexian
 
 Apache License, Version 2.0
+
+## About
+
+- [Li Kexian](https://www.likexian.com/)

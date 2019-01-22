@@ -3,9 +3,9 @@
 
 ##
 # DNSPod API Flask Web 示例
-# http://www.likexian.com/
+# https://www.likexian.com/
 #
-# Copyright 2011-2014, Kexian Li
+# Copyright 2011-2019, Li Kexian
 # Released under the Apache License, Version 2.0
 #
 ##
