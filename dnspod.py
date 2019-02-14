@@ -11,7 +11,6 @@
 ##
 
 
-import ssl
 import json
 import requests
 from flask import session
@@ -23,8 +22,7 @@ class MyAdapter(HTTPAdapter):
     def init_poolmanager(self, connections, maxsize, block=False):
         self.poolmanager = PoolManager(num_pools=connections,
                                        maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1_2)
+                                       block=block)
 
 
 class utils:
@@ -96,12 +94,12 @@ class dnspod(object):
             raise DNSPodException('danger', u'内部错误：参数错误', '')
 
         api = 'https://dnsapi.cn/' + api
-        data.update({'login_email': session['login_email'], 'login_password': session['login_password'],
-            'login_code': session['login_code'], 'format': 'json', 'lang': 'cn', 'error_on_empty': 'no'})
+        data.update({'login_token': session['token_id'] + "," + session['token_key'],
+            'format': 'json', 'lang': 'cn', 'error_on_empty': 'no'})
 
         results = self.post_data(api, data, session.get('cookies', ''))
         code = int(results.get('status', {}).get('code', 0))
-        if code not in [1, 50]:
+        if code != 1:
             raise DNSPodException('danger', results.get('status', {}).get('message', u'内部错误：未知错误'), '')
 
         return results
@@ -113,12 +111,12 @@ class dnspod(object):
             headers = {'User-Agent': 'DNSPod API Flask Web Client/1.0.0 (i@likexian.com)'}
             response = request.post(api, data=data, headers=headers, cookies=cookies, timeout=30)
             results = json.loads(response.text)
-        except:
+        except Exception:
             raise DNSPodException('danger', u'内部错误：调用失败', '')
 
         if hasattr(response, 'cookies'):
             for i in response.cookies:
-                    if i.name[0] == 't':
-                        session['cookies'] = {i.name: i.value}
+                if i.name[0] == 't':
+                    session['cookies'] = {i.name: i.value}
 
         return results

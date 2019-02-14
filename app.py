@@ -15,7 +15,6 @@ import os
 from flask import Flask
 from flask import request
 from flask import send_from_directory
-from flask import redirect
 from flask import session
 import dnspod
 
@@ -37,62 +36,21 @@ def get_login():
     return text
 
 
-@app.route('/logind', methods=['GET'])
-@dnspod.utils.html_wrap
-def get_logind():
-    if not session['login_email'] or not session['login_password']:
-        raise dnspod.DNSPodException('danger', u'参数错误。', -1)
-    text = dnspod.utils.get_template('logind')
-    text = text.replace('{{title}}', u'用户登录')
-    text = text.replace('{{action}}', u'domainlist')
-    return text
-
-
-@app.route('/domainstatusd', methods=['GET'])
-@dnspod.utils.html_wrap
-def get_domainstatusd():
-    if not request.args.get('domain_id') or not request.args.get('status'):
-        raise dnspod.DNSPodException('danger', u'参数错误。', -1)
-    text = dnspod.utils.get_template('logind')
-    text = text.replace('{{title}}', u'域名' + (u'启用' if request.args.get('status') == 'enable' else u'暂停'))
-    text = text.replace('{{action}}',
-        u'domainstatus?domain_id=%s&status=%s' % (request.args.get('domain_id'), request.args.get('status')))
-    return text
-
-
-@app.route('/domainremoved', methods=['GET'])
-@dnspod.utils.html_wrap
-def get_domainremoved():
-    if not request.args.get('domain_id'):
-        raise dnspod.DNSPodException('danger', u'参数错误。', -1)
-    text = dnspod.utils.get_template('logind')
-    text = text.replace('{{title}}', u'域名删除')
-    text = text.replace('{{action}}', u'domainremove?domain_id=%s' % request.args.get('domain_id'))
-    return text
-
-
 @app.route('/domainlist', methods=['GET', 'POST'])
 @dnspod.utils.html_wrap
 def get_domainlist():
     if request.method == 'POST':
-        if not request.form.get('login_code'):
-            if not request.form['login_email']:
-                raise dnspod.DNSPodException('danger', u'请输入登录账号。', -1)
-            else:
-                session['login_email'] = request.form['login_email']
-
-            if not request.form['login_password']:
-                raise dnspod.DNSPodException('danger', u'请输入登录密码。', -1)
-            else:
-                session['login_password'] = request.form['login_password']
-
-            session['login_code'] = ''
+        if not request.form['token_id']:
+            raise dnspod.DNSPodException('danger', u'请输入Token ID。', -1)
         else:
-            session['login_code'] = request.form['login_code']
+            session['token_id'] = request.form['token_id']
+
+        if not request.form['token_key']:
+            raise dnspod.DNSPodException('danger', u'请输入Token Key。', -1)
+        else:
+            session['token_key'] = request.form['token_key']
 
     response = dnspod_api.api_call('Domain.List', {})
-    if response['status']['code'] == '50':
-        return redirect('/logind')
 
     list_text = ''
     domain_sub = dnspod.utils.read_text('./template/domain_sub.html')
@@ -132,11 +90,8 @@ def get_domainstatus():
     if not request.args.get('status'):
         raise dnspod.DNSPodException('danger', u'参数错误。', -1)
 
-    session['login_code'] = request.form.get('login_code')
-    response = dnspod_api.api_call('Domain.Status', {'domain_id': request.args.get('domain_id'),
+    dnspod_api.api_call('Domain.Status', {'domain_id': request.args.get('domain_id'),
         'status': request.args.get('status')})
-    if response['status']['code'] == '50':
-        return redirect('domainstatusd?domain_id=%s&status=%s' % (request.args.get('domain_id'), request.args.get('status')))
 
     raise dnspod.DNSPodException('success',
         (u'启用' if request.args.get('status') == 'enable' else u'暂停') + u'成功。', '/domainlist')
@@ -148,10 +103,7 @@ def get_domainremove():
     if not request.args.get('domain_id'):
         raise dnspod.DNSPodException('danger', u'参数错误。', -1)
 
-    session['login_code'] = request.form.get('login_code')
-    response = dnspod_api.api_call('Domain.Remove', {'domain_id': request.args.get('domain_id')})
-    if response['status']['code'] == '50':
-        return redirect('domainremoved?domain_id=%s' % request.args.get('domain_id'))
+    dnspod_api.api_call('Domain.Remove', {'domain_id': request.args.get('domain_id')})
 
     raise dnspod.DNSPodException('success', u'删除成功。', '/domainlist')
 
