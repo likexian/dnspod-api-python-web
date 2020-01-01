@@ -1,4 +1,4 @@
-# DNSPod API Flask Web 示例
+# DNSPod API Python Web 示例
 
 ## DEMO 图片
 

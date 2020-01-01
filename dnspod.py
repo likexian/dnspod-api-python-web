@@ -16,7 +16,7 @@
  ' See the License for the specific language governing permissions and
  ' limitations under the License.
  '
- ' DNSPod API Flask Web 示例
+ ' DNSPod API Python Web 示例
  ' https://www.likexian.com/
  '''
 
@@ -45,7 +45,12 @@ class utils:
     @staticmethod
     def read_text(fname):
         fp = open(fname, 'r')
-        text = fp.read().decode('utf-8')
+        text = fp.read()
+        try:
+            # python2 need this
+            text = text.decode('utf-8')
+        except:
+            pass
         fp.close()
         return text
 
@@ -58,14 +63,14 @@ class utils:
             try:
                 r = fn(*args, **kargs)
                 return r
-            except DNSPodException, e:
+            except DNSPodException as e:
                 text = utils.get_template('message')
                 text = text.replace('{{title}}', u'操作成功' if e.status == 'success' else u'操作失败')
                 text = text.replace('{{status}}', e.status)
                 text = text.replace('{{message}}', e.message)
                 text = text.replace('{{url}}', e.url)
                 return text
-            except Exception, e:
+            except Exception as e:
                 return str(e)
         return wrap
 
@@ -117,7 +122,7 @@ class dnspod(object):
         try:
             request = requests.Session()
             request.mount('https://', MyAdapter())
-            headers = {'User-Agent': 'DNSPod API Flask Web Client/1.0.0 (i@likexian.com)'}
+            headers = {'User-Agent': 'DNSPod API Python Web Client/1.0.0 (i@likexian.com)'}
             response = request.post(api, data=data, headers=headers, cookies=cookies, timeout=30)
             results = json.loads(response.text)
         except Exception:

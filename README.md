@@ -1,4 +1,4 @@
-# DNSPod API Flask Web 示例
+# DNSPod API Python Web 示例
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
@@ -23,7 +23,6 @@
 ## 环境要求
 
 - Python2.x
-- json
 - flask
 - requests
 

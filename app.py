@@ -16,7 +16,7 @@
  ' See the License for the specific language governing permissions and
  ' limitations under the License.
  '
- ' DNSPod API Flask Web 示例
+ ' DNSPod API Python Web 示例
  ' https://www.likexian.com/
  '''
 
