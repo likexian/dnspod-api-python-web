@@ -158,16 +158,17 @@ def get_recordcreatef():
         response = dnspod_api.api_call('Record.Type', {'domain_grade': request.args.get('grade')})
         session['type_' + request.args.get('grade')] = response['types']
 
-    if 'line_' + request.args.get('grade') not in session:
-        response = dnspod_api.api_call('Record.Line', {'domain_grade': request.args.get('grade')})
-        session['line_' + request.args.get('grade')] = response['lines']
+    if 'line_' + request.args.get('domain_id') not in session:
+        response = dnspod_api.api_call('Record.Line',
+            {'domain_id': request.args.get('domain_id'), 'domain_grade': request.args.get('grade')})
+        session['line_' + request.args.get('domain_id')] = response['lines']
 
     type_list = ''
     for value in session['type_' + request.args.get('grade')]:
         type_list += '<option value="%s">%s</option>' % (value, value)
 
     line_list = ''
-    for value in session['line_' + request.args.get('grade')]:
+    for value in session['line_' + request.args.get('domain_id')]:
         line_list += '<option value="%s">%s</option>' % (value, value)
 
     text = dnspod.utils.get_template('recordcreatef')
@@ -234,9 +235,10 @@ def get_recordeditf():
         response = dnspod_api.api_call('Record.Type', {'domain_grade': request.args.get('grade')})
         session['type_' + request.args.get('grade')] = response['types']
 
-    if 'line_' + request.args.get('grade') not in session:
-        response = dnspod_api.api_call('Record.Line', {'domain_grade': request.args.get('grade')})
-        session['line_' + request.args.get('grade')] = response['lines']
+    if 'line_' + request.args.get('domain_id') not in session:
+        response = dnspod_api.api_call('Record.Line',
+            {'domain_id': request.args.get('domain_id'), 'domain_grade': request.args.get('grade')})
+        session['line_' + request.args.get('domain_id')] = response['lines']
 
     type_list = ''
     for value in session['type_' + request.args.get('grade')]:
@@ -244,7 +246,7 @@ def get_recordeditf():
             'selected="selected"' if record['record_type'] == value else '', value)
 
     line_list = ''
-    for value in session['line_' + request.args.get('grade')]:
+    for value in session['line_' + request.args.get('domain_id')]:
         line_list += '<option value="%s" %s>%s</option>' % (value,
         'selected="selected"' if record['record_line'] == value else '', value)
 
