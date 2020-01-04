@@ -114,7 +114,7 @@ class dnspod(object):
         results = self.post_data(api, data, session.get('cookies', ''))
         code = int(results.get('status', {}).get('code', 0))
         if code != 1:
-            raise DNSPodException('danger', results.get('status', {}).get('message', u'内部错误：未知错误'), '')
+            raise DNSPodException('danger', results.get('status', {}).get('message', u'内部错误：未知错误'), '-1')
 
         return results
 
