@@ -22,7 +22,7 @@
 
 ## 环境要求
 
-- Python2.x
+- Python2.x/3.x
 - flask
 - requests
 

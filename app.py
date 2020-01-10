@@ -138,6 +138,7 @@ def get_recordlist():
         list_sub = list_sub.replace('{{status_text}}', u'暂停' if int(record['enabled']) else u'启用')
         list_sub = list_sub.replace('{{mx}}', record['mx'])
         list_sub = list_sub.replace('{{ttl}}', record['ttl'])
+        list_sub = list_sub.replace('{{remark}}', record['remark'])
         list_text += list_sub
 
     text = dnspod.utils.get_template('record')
@@ -182,6 +183,7 @@ def get_recordcreatef():
     text = text.replace('{{value}}', '')
     text = text.replace('{{mx}}', '10')
     text = text.replace('{{ttl}}', '600')
+    text = text.replace('{{remark}}', '')
     return text
 
 
@@ -206,7 +208,7 @@ def post_recordcreate():
     if not request.form.get('ttl'):
         ttl = 600
 
-    dnspod_api.api_call('Record.Create',
+    response = dnspod_api.api_call('Record.Create',
         {'domain_id': request.args.get('domain_id'),
         'sub_domain': sub_domain or request.form['sub_domain'],
         'record_type': request.form['type'],
@@ -215,6 +217,14 @@ def post_recordcreate():
         'mx': mx or request.form['mx'],
         'ttl': ttl or request.form['ttl']}
     )
+
+    if request.form['remark'] != "":
+        dnspod_api.api_call('Record.Remark',
+            {'domain_id': request.args.get('domain_id'),
+            'record_id': response['record']['id'],
+            'remark': request.form['remark'],
+            }
+        )
 
     raise dnspod.DNSPodException('success', u'添加成功。', '/recordlist?domain_id=%s' % request.args.get('domain_id'))
 
@@ -261,6 +271,7 @@ def get_recordeditf():
     text = text.replace('{{value}}', record['value'])
     text = text.replace('{{mx}}', record['mx'])
     text = text.replace('{{ttl}}', record['ttl'])
+    text = text.replace('{{remark}}', record['remark'])
     return text
 
 
@@ -297,6 +308,14 @@ def post_recordedit():
         'mx': mx or request.form['mx'],
         'ttl': ttl or request.form['ttl']}
     )
+
+    if request.form['remark'] != request.form['oremark']:
+        dnspod_api.api_call('Record.Remark',
+            {'domain_id': request.args.get('domain_id'),
+            'record_id': request.args.get('record_id'),
+            'remark': request.form['remark'],
+            }
+        )
 
     raise dnspod.DNSPodException('success', u'修改成功。', '/recordlist?domain_id=%s' % request.args.get('domain_id'))
 
