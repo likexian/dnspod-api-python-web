@@ -122,7 +122,7 @@ class dnspod(object):
         try:
             request = requests.Session()
             request.mount('https://', MyAdapter())
-            headers = {'User-Agent': 'DNSPod API Python Web Client/1.0.0 (i@likexian.com)'}
+            headers = {'User-Agent': 'DNSPod API Python Web Client/2.0.0 (+https://www.likexian.com/)'}
             response = request.post(api, data=data, headers=headers, cookies=cookies, timeout=30)
             results = json.loads(response.text)
         except Exception:
