@@ -20,6 +20,7 @@
  ' https://www.likexian.com/
  '''
 
+import os
 import json
 import requests
 from flask import session
@@ -36,9 +37,9 @@ class MyAdapter(HTTPAdapter):
 
 class utils:
     @staticmethod
-    def get_template(template):
-        text = utils.read_text('./template/%s.html' % template)
-        master = utils.read_text('./template/index.html')
+    def get_template(base_dir, template):
+        text = utils.read_text(base_dir+'/template/%s.html' % template)
+        master = utils.read_text(base_dir+'/template/index.html')
         master = master.replace('{{content}}', text)
         return master
 
@@ -64,7 +65,8 @@ class utils:
                 r = fn(*args, **kargs)
                 return r
             except DNSPodException as e:
-                text = utils.get_template('message')
+                base_dir = os.path.dirname(os.path.realpath(__file__))
+                text = utils.get_template(base_dir, 'message')
                 text = text.replace('{{title}}', u'操作成功' if e.status == 'success' else u'操作失败')
                 text = text.replace('{{status}}', e.status)
                 text = text.replace('{{message}}', e.message)

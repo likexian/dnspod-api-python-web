@@ -30,17 +30,18 @@ import dnspod
 
 app = Flask('app')
 dnspod_api = dnspod.dnspod()
+base_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 @app.route('/css/bootstrap.css')
 def favicon():
-    return send_from_directory(os.path.join('./', 'css'), 'bootstrap.css')
+    return send_from_directory(os.path.join(base_dir, 'css'), 'bootstrap.css')
 
 
 @app.route('/', methods=['GET'])
 @dnspod.utils.html_wrap
 def get_login():
-    text = dnspod.utils.get_template('login')
+    text = dnspod.utils.get_template(base_dir, 'login')
     text = text.replace('{{title}}', u'用户登录')
     return text
 
@@ -62,7 +63,7 @@ def get_domainlist():
     response = dnspod_api.api_call('Domain.List', {})
 
     list_text = ''
-    domain_sub = dnspod.utils.read_text('./template/domain_sub.html')
+    domain_sub = dnspod.utils.read_text(base_dir+'/template/domain_sub.html')
     for domain in response['domains']:
         list_sub = domain_sub.replace('{{id}}', str(domain['id']))
         list_sub = list_sub.replace('{{domain}}', domain['name'])
@@ -74,7 +75,7 @@ def get_domainlist():
         list_sub = list_sub.replace('{{updated_on}}', domain['updated_on'])
         list_text += list_sub
 
-    text = dnspod.utils.get_template('domain')
+    text = dnspod.utils.get_template(base_dir, 'domain')
     text = text.replace('{{title}}', u'域名列表')
     text = text.replace('{{list}}', list_text)
     return text
@@ -125,7 +126,7 @@ def get_recordlist():
 
     response = dnspod_api.api_call('Record.List', {'domain_id': request.args.get('domain_id')})
     list_text = ''
-    domain_sub = dnspod.utils.read_text('./template/record_sub.html')
+    domain_sub = dnspod.utils.read_text(base_dir+'/template/record_sub.html')
     for record in response['records']:
         list_sub = domain_sub.replace('{{domain_id}}', request.args.get('domain_id'))
         list_sub = list_sub.replace('{{id}}', str(record['id']))
@@ -141,7 +142,7 @@ def get_recordlist():
         list_sub = list_sub.replace('{{remark}}', record['remark'])
         list_text += list_sub
 
-    text = dnspod.utils.get_template('record')
+    text = dnspod.utils.get_template(base_dir, 'record')
     text = text.replace('{{title}}', u'记录列表 - %s' % (response['domain']['name']))
     text = text.replace('{{list}}', list_text)
     text = text.replace('{{domain_id}}', str(response['domain']['id']))
@@ -172,7 +173,7 @@ def get_recordcreatef():
     for value in session['line_' + request.args.get('domain_id')]:
         line_list += '<option value="%s">%s</option>' % (value, value)
 
-    text = dnspod.utils.get_template('recordcreatef')
+    text = dnspod.utils.get_template(base_dir, 'recordcreatef')
     text = text.replace('{{title}}', u'添加记录')
     text = text.replace('{{action}}', 'recordcreate')
     text = text.replace('{{domain_id}}', request.args.get('domain_id'))
@@ -260,7 +261,7 @@ def get_recordeditf():
         line_list += '<option value="%s" %s>%s</option>' % (value,
         'selected="selected"' if record['record_line'] == value else '', value)
 
-    text = dnspod.utils.get_template('recordcreatef')
+    text = dnspod.utils.get_template(base_dir, 'recordcreatef')
     text = text.replace('{{title}}', u'修改记录')
     text = text.replace('{{action}}', 'recordedit')
     text = text.replace('{{domain_id}}', request.args.get('domain_id'))
@@ -356,7 +357,11 @@ def get_recordstatus():
         '/recordlist?domain_id=%s' % request.args.get('domain_id'))
 
 
-if __name__ == '__main__':
+def main():
     app.secret_key = '7roTu0tLyfksj48G0rbRb556b3tv94q0'
     app.debug = True
     app.run()
+
+
+if __name__ == '__main__':
+    main()

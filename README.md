@@ -28,9 +28,14 @@
 
 ## 安装说明
 
-在当前目录运行
+下载代码库之后，在当前目录运行
 
-    python app.py
+    $ python app.py
+
+您还可以通过 pip 来安装并测试
+
+    $ pip install dnspod-web
+    $ dnspod-web
 
 然后在浏览器中打开 http://127.0.0.1:5000/ 即可查看示例。
 
